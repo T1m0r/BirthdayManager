@@ -1,9 +1,11 @@
 import React from "react";
 import clsx from "clsx";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
 import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
@@ -128,6 +130,8 @@ export default function Dashboard() {
 	};
 	const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+	const history = useHistory();
+
 	return (
 		<div className={classes.root}>
 			<CssBaseline />
@@ -159,6 +163,13 @@ export default function Dashboard() {
 							<NotificationsIcon />
 						</Badge>
 					</IconButton>
+					<Button
+						variant='contained'
+						primary
+						style={{ marginLeft: "20px" }}
+						onClick={() => history.push("/logout")}>
+						Logout
+					</Button>
 				</Toolbar>
 			</AppBar>
 			<Drawer
