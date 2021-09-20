@@ -46,4 +46,74 @@ const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ promp: "select_account" });
 export const signInWithGoogle = () => auth.signInWithPopup(provider);
 
+export const queryBirthdays = async (id, storedBirthdays) => {
+	let res = [];
+	await Promise.all(
+		storedBirthdays.map(async (item) => {
+			const data = await queryDocumentElement("birthdays", item, "get");
+			res = [...res, { id: data.id, ...data.data() }];
+		})
+	);
+	return res;
+	// Get all birthdays
+	// const res = firestore.collection("birthdays");
+	// const data = await res.get();
+	// let ret = [];
+	// 		data.docs.forEach((item) => {
+	// 		console.log(item.id);
+	// 		ret = [...ret, { id: item.id, ...item.data() }];
+	// 	})
+	// );
+	// return ret;
+};
+export const queryDocumentElement = async (
+	document,
+	elementID,
+	stage = "data"
+) => {
+	const res = await firestore.collection(document).doc(elementID);
+	if (stage === "request") {
+		return res;
+	} else {
+		const data = await res.get();
+		if (stage === "get") {
+			return data;
+		} else if (stage === "data") {
+			return data.data();
+		}
+	}
+	// console.log(data.data());
+};
+
+export const addDocument = async (document, element) => {
+	return await firestore.collection(document).add(element);
+};
+
+export const updateUser = async (id, type, updateField, updateValue) => {
+	var user = await firestore.collection("users").doc(id);
+	console.log(user);
+	if (type === "addArray") {
+		// Atomically add a new region to the "regions" array field.
+		const newUser = await user.update({
+			[updateField]: firebase.firestore.FieldValue.arrayUnion(updateValue),
+		});
+		console.log("her", newUser);
+	} else if (type === "removeArray") {
+		// Atomically remove a region from the "regions" array field.
+		await user.update({
+			[updateField]: firebase.firestore.FieldValue.arrayRemove(updateValue),
+		});
+	}
+};
+
+export const addBirthday = async (id, element) => {
+	const newDoc = await addDocument("birthdays", element);
+	await updateUser(id, "addArray", "storedBirthdays", newDoc.id);
+};
+
+export const removeDocument = async (userId, document, docId) => {
+	const item = await queryDocumentElement(document, docId, "request");
+	item.delete();
+	await updateUser(userId, "removeArray", "storedBirthdays", docId);
+};
 export default app;

@@ -6,11 +6,23 @@ import LogIn from "./pages/logIn.js";
 import Logout from "./components/logout.js";
 import ProtectedRoute from "./components/protectedRoute";
 import Dashboard from "./pages/dashboard";
+import AuthAppBar from "./components/AuthAppBar.js";
+import BirthdayCountdown from "./pages/BirthdayCountdown.js";
+import FlipCountdownTimer from "./components/FlipCountdownTimer";
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { connect } from "react-redux";
 //import { createStructuredSelector } from "reselect";
 import { setCurrentUser } from "./redux/user/user.actions";
 import "./App.css";
+
+//========//TODO\\=======\\
+// - Add Action Buttons to Table in Dashboard (Edit)
+// - Create Better Table (sortable) for Dashboard
+// - Improve Dashboard (Table add column group) and improve add new user form
+// - Create custom shareable dashboards for a list of people
+// - Set birthdays to private or public
+// - Create faster Countdowns
+// - Create more Customization for Countdown - happy birthday screen custom imgs
 
 class App extends React.Component {
 	unsubscribeFromAuth = null;
@@ -51,7 +63,20 @@ class App extends React.Component {
 							<Redirect to='/dashboard' />
 						)}
 					</Route>
-					<ProtectedRoute path='/logout' component={Logout} />
+					<ProtectedRoute
+						path='/logout'
+						component={Logout}
+						user={currentUser}
+					/>
+					<Route path='/birthday/countdown/:id'>
+						{currentUser.user ? (
+							<AuthAppBar>
+								<FlipCountdownTimer />
+							</AuthAppBar>
+						) : (
+							<FlipCountdownTimer />
+						)}
+					</Route>
 					<ProtectedRoute
 						path='/dashboard'
 						title='Home'
