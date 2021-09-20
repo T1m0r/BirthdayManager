@@ -16,9 +16,11 @@ const FlipCountdownTimer = (props) => {
 
 	useEffect(() => {
 		const setBirthdayData = async () => {
-			let data = await (
-				await queryDocumentElement("birthdays", props.match.params.id)
-			).data();
+			let data = await await queryDocumentElement(
+				"birthdays",
+				props.match.params.id,
+				"data"
+			);
 			await setBirthday(data.birthday.toDate());
 			setName(data.name);
 		};
