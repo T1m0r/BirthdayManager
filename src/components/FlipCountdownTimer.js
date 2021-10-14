@@ -23,6 +23,7 @@ const FlipCountdownTimer = (props) => {
 			);
 			await setBirthday(data.birthday.toDate());
 			setName(data.name);
+			document.title = `⏳ ${data.name} Geburtstags - Countdown`;
 		};
 		setBirthdayData();
 	}, []);

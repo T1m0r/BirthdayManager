@@ -53,7 +53,10 @@ function isOver(birthday) {
 	// Return True if birthday already happend this year
 	if (now.getMonth() > birthday.getMonth()) {
 		return true;
-	} else if (now.getDay() > birthday.getDay()) {
+	} else if (
+		now.getMonth() == birthday.getMonth() &&
+		now.getDay() > birthday.getDay()
+	) {
 		return true;
 	} else {
 		return false;
