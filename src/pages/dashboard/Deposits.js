@@ -18,7 +18,7 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function Deposits() {
+export default function Deposits({ data }) {
 	const user = useSelector((state) => state.user).user;
 	const [name, setName] = useState("");
 	const [date, setDate] = useState(null);
@@ -34,6 +34,7 @@ export default function Deposits() {
 		});
 		setName("");
 		setDate(null);
+		data = `${user.id}-${name}-${date}-${new Date().getTime()}`;
 	}
 
 	return (

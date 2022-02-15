@@ -50,22 +50,38 @@ function calculateAge(birthday) {
 function isOver(birthday) {
 	// birthday is a date
 	const now = new Date();
-	// Return True if birthday already happend this year
-	if (now.getMonth() > birthday.getMonth()) {
-		return true;
-	} else if (
-		now.getMonth() == birthday.getMonth() &&
-		now.getDay() > birthday.getDay()
-	) {
-		return true;
-	} else {
-		return false;
-	}
+	var birthdayDate = new Date(birthday);
+	birthdayDate = birthdayDate.setFullYear(now.getFullYear());
+	birthdayDate = new Date(birthdayDate);
+
+	return now > birthdayDate;
 }
 
-export default function ListTable() {
+function applyIsOver(data) {
+	return data.map((birthday) => {
+		birthday.isOver = isOver(birthday.birthday.toDate());
+		return birthday;
+	});
+	return data;
+}
+
+function getBirthdaysInMonth(data, month) {
+	console.log(data);
+	var birthdays = [];
+	for (var i = 0; i < data.length; i++) {
+		console.log("bday", data[i].birthday.toDate(), month);
+		if (data[i].birthday.toDate().getMonth() === month) {
+			console.log(data[i]);
+			birthdays.push(data[i]);
+		}
+	}
+	return birthdays;
+}
+
+export default function ListTable({ bdays }) {
 	const user = useSelector((state) => state.user).user;
-	const [birthdays, setBirthdays] = useState(null);
+	const [birthdays, setBirthdays] = useState(bdays);
+	console.log(bdays, birthdays);
 	const [open, setOpen] = useState(false);
 	const [target, setTarget] = useState(null);
 	const history = useHistory();
@@ -80,16 +96,6 @@ export default function ListTable() {
 		setTarget(null);
 	};
 
-	let data = null;
-	useEffect(() => {
-		const setBirthdayData = async () => {
-			data = await queryBirthdays(user.id, user.storedBirthdays);
-			console.log("data", data);
-			setBirthdays(data);
-		};
-		setBirthdayData();
-	}, []);
-
 	const handleDelete = async () => {
 		await removeDocument(user.id, "birthdays", target.id);
 		setBirthdays(birthdays.filter((item) => item.id !== target.id));
@@ -98,21 +104,22 @@ export default function ListTable() {
 
 	return (
 		<React.Fragment>
-			{!!birthdays ? (
+			{!!bdays ? (
 				<React.Fragment>
 					<TableContainer component={Paper}>
 						<Table sx={{ minWidth: 700 }} aria-label='customized table'>
 							<TableHead>
 								<TableRow>
 									<StyledTableCell>Name</StyledTableCell>
-									<StyledTableCell align='right'>Birthday</StyledTableCell>
-									<StyledTableCell align='right'>Age</StyledTableCell>
-									<StyledTableCell align='right'>Happened</StyledTableCell>
+									<StyledTableCell align='center'>Birthday</StyledTableCell>
+									<StyledTableCell align='center'>Age</StyledTableCell>
+									<StyledTableCell align='center'>Happened</StyledTableCell>
+									<StyledTableCell align='center'>This Month</StyledTableCell>
 									<StyledTableCell align='right'>Action</StyledTableCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{birthdays.map((date) => (
+								{bdays.map((date) => (
 									<StyledTableRow
 										key={date.id}
 										// onClick={() => history.push(`birthday/countdown/${date.id}`)}
@@ -122,15 +129,33 @@ export default function ListTable() {
 												{date.name}
 											</Link>
 										</StyledTableCell>
-										<StyledTableCell align='right'>
+										<StyledTableCell align='center'>
 											{date.birthday.toDate().toDateString()}
 										</StyledTableCell>
-										<StyledTableCell align='right'>
+										<StyledTableCell align='center'>
 											{calculateAge(date.birthday.toDate())}
 										</StyledTableCell>
-										<StyledTableCell align='right'>
-											{isOver(date.birthday.toDate()) ? "Yes" : "Not yet"}
+										<StyledTableCell
+											align='center'
+											style={
+												date.isOver
+													? { margin: "10px", backgroundColor: "#c9ffd9" }
+													: {}
+											}>
+											{date.isOver ? "Yes" : "Not yet"}
 										</StyledTableCell>
+										<StyledTableCell
+											align='center'
+											style={
+												date.birthday.toDate().getMonth() ===
+												new Date().getMonth()
+													? {
+															margin: "10px",
+															backgroundColor: "#2266FD",
+															width: "12px",
+													  }
+													: { width: "12px" }
+											}></StyledTableCell>
 										<StyledTableCell align='right'>
 											<Button onClick={() => handleClickOpen(date)}>
 												<DeleteIcon />

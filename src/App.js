@@ -82,7 +82,7 @@ class App extends React.Component {
 						title='Home'
 						component={Dashboard}
 					/>
-					<Route path='/' component={Home} />
+					<Route path='/' component={currentUser.user ? Dashboard : Home} />
 				</Switch>
 			</div>
 		);
